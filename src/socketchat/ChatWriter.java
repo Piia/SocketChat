@@ -30,7 +30,7 @@ public class ChatWriter implements Runnable {
         while(true) {
             String message;
             try {
-                message = console.readNext();
+                message = console.readNext() + "\n";
             } catch (InterruptedException ex) {
                 Logger.getLogger(ChatWriter.class.getName()).log(Level.SEVERE, null, ex);
                 throw new IllegalStateException("console was interrupted while writing");
