@@ -50,7 +50,7 @@ public class ChatConsole implements Runnable {
     public void run() {
         while(true) {
             try {
-                queue.put(scanner.nextLine());
+                queue.put(scanner.nextLine() + "\n");
             } catch (InterruptedException ex) {
                 Logger.getLogger(ChatConsole.class.getName()).log(Level.SEVERE, null, ex);
             }

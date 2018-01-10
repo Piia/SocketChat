@@ -29,6 +29,8 @@ public class ChatReader implements Runnable {
     public void run() {
         while(true) {
             try {
+                //Character.toString((char) inFromClient.read());
+                //console.write(Character.toString((char) inFromClient.read()));
                 console.write("FRIEND: " + inFromClient.readLine());
             } catch (IOException ex) {
                 Logger.getLogger(ChatReader.class.getName()).log(Level.SEVERE, null, ex);
