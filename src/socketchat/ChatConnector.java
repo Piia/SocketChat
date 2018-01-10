@@ -22,16 +22,20 @@ public class ChatConnector {
     private final ChatConsole console;
     private ServerSocket serverSocket;
     private Socket clientSocket;
-    
+        
     private final Thread caller = new Thread(new Runnable() {
         @Override
         public void run() {
+            
+            String clientAddress;
+            int clientPort;
+            
             try {
-                console.write("Give address: ");
-                String clientAddress = console.readNext();
+                console.write("Give address: ");                
+                clientAddress = console.pollNext();
 
                 console.write("Give port number: ");
-                int clientPort = Integer.parseInt(console.readNext());
+                clientPort = Integer.parseInt(console.pollNext());
 
                 try {
                     serverSocket.close();
@@ -45,7 +49,7 @@ public class ChatConnector {
                     Logger.getLogger(ChatConnector.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } catch(InterruptedException e) {
-            
+                // Interrupt is used to stop this thread.
             }
         }
     });
