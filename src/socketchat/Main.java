@@ -21,6 +21,8 @@ public class Main {
      */
     public static void main(String[] args) throws IOException, InterruptedException {
         ChatConsole console = new ChatConsole();
+        Thread consoleThread = new Thread(console);
+        consoleThread.start();
         ChatConnector connector = new ChatConnector(8888, console);
         console.write("DEBUG: waiting for connection...");
         Socket connection = connector.getConnection();
