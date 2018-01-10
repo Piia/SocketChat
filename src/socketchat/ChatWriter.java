@@ -28,7 +28,14 @@ public class ChatWriter implements Runnable {
     @Override
     public void run() {
         while(true) {
-            String message = console.readNext();
+            String message;
+            try {
+                message = console.readNext();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(ChatWriter.class.getName()).log(Level.SEVERE, null, ex);
+                throw new IllegalStateException("console was interrupted while writing");
+            }
+            
             try {
                 outToClient.writeBytes(message);
             } catch (IOException ex) {

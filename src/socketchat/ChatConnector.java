@@ -32,10 +32,10 @@ public class ChatConnector {
             
             try {
                 console.write("Give address: ");                
-                clientAddress = console.pollNext();
+                clientAddress = console.readNext();
 
                 console.write("Give port number: ");
-                clientPort = Integer.parseInt(console.pollNext());
+                clientPort = Integer.parseInt(console.readNext());
 
                 try {
                     serverSocket.close();
@@ -50,6 +50,7 @@ public class ChatConnector {
                 }
             } catch(InterruptedException e) {
                 // Interrupt is used to stop this thread.
+                console.write("DEBUG: Interrupt fired");
             }
         }
     });
@@ -58,10 +59,12 @@ public class ChatConnector {
         @Override
         public void run() {
             try {
+                console.write("DEBUG: calling accept");
                 clientSocket = serverSocket.accept();
+                console.write("DEBUG: accept returned - interrupting caller");
                 caller.interrupt();
             } catch (SocketException e){
-                
+                console.write("DEBUG: Friend called");
             } catch (IOException ex) {
                 Logger.getLogger(ChatConnector.class.getName()).log(Level.SEVERE, null, ex);
             }
