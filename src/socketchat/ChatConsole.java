@@ -2,7 +2,6 @@ package socketchat;
 
 import java.util.Scanner;
 
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,10 +12,11 @@ import java.util.logging.Logger;
 public class ChatConsole implements Runnable {
 
     private final Scanner scanner;
-    private final LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<String> queue;
 
     public ChatConsole() {
         this.scanner = new Scanner(System.in);
+        this.queue = new LinkedBlockingQueue<>();
     }
 
     public void write(String message) {
@@ -24,27 +24,8 @@ public class ChatConsole implements Runnable {
     }
 
     public String readNext() throws InterruptedException {
-        //return scanner.nextLine();
         return queue.take();
     }
-
-    /*public String pollNext() throws InterruptedException {
-        String nextInput;
-        while (true) {
-            if (this.hasNextLine()) {
-                nextInput = this.readNext();
-                break;
-            } else {
-                Thread.sleep(60);
-            }
-        }
-        return nextInput;
-    }*/
-        
-
-    //private boolean hasNextLine() {
-    //    return scanner.hasNextLine();
-    //}
 
     @Override
     public void run() {
@@ -52,6 +33,7 @@ public class ChatConsole implements Runnable {
             try {
                 queue.put(scanner.nextLine());
             } catch (InterruptedException ex) {
+                // todo: handle exception (quit program or recover properly)
                 Logger.getLogger(ChatConsole.class.getName()).log(Level.SEVERE, null, ex);
             }
         }

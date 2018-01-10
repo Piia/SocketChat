@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package socketchat;
 
 import java.io.BufferedReader;
@@ -16,7 +10,7 @@ import java.util.logging.Logger;
  * @author Piia Hartikka
  */
 public class ChatReader implements Runnable {
-    
+
     private final ChatConsole console;
     private final BufferedReader inFromClient;
 
@@ -24,15 +18,21 @@ public class ChatReader implements Runnable {
         this.console = console;
         this.inFromClient = inFromClient;
     }
-    
+
     @Override
     public void run() {
-        while(true) {
+        while (true) {
+            String message;
             try {
-                //Character.toString((char) inFromClient.read());
-                //console.write(Character.toString((char) inFromClient.read()));
-                console.write("FRIEND: " + inFromClient.readLine());
+                message = inFromClient.readLine();
+                if (message == null) {
+                    // todo: quit only when multiple null messages arrive
+                    console.write("Friend disconnected... quitting!");
+                    break;
+                }
+                console.write("FRIEND: " + message);
             } catch (IOException ex) {
+                // todo: handle exception (quit program or recover properly)
                 Logger.getLogger(ChatReader.class.getName()).log(Level.SEVERE, null, ex);
             }
         }

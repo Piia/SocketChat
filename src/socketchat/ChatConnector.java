@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package socketchat;
 
 import java.io.IOException;
@@ -12,6 +6,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 /**
  *
  * @author Piia Hartikka
@@ -21,20 +16,21 @@ public class ChatConnector {
     private final int serverPort;
     private final ChatConsole console;
     private ServerSocket serverSocket;
-    private Socket clientSocket;
-        
+    private Socket connection;
+
     private final Thread caller = new Thread(new Runnable() {
         @Override
         public void run() {
-            
+
             String clientAddress;
             int clientPort;
-            
+
             try {
-                console.write("Give address: ");                
+                console.write("Give friend's IP-address: ");
                 clientAddress = console.readNext();
 
-                console.write("Give port number: ");
+                console.write("Give friend's port number: ");
+                // todo: prevent NumberFormatException
                 clientPort = Integer.parseInt(console.readNext());
 
                 try {
@@ -44,50 +40,57 @@ public class ChatConnector {
                 }
 
                 try {
-                    clientSocket = new Socket(clientAddress, clientPort);
+                    connection = new Socket(clientAddress, clientPort);
                 } catch (IOException ex) {
+                    // todo: handle exception (quit program or recover properly)
                     Logger.getLogger(ChatConnector.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            } catch(InterruptedException e) {
-                // Interrupt is used to stop this thread.
-                console.write("DEBUG: Interrupt fired");
+            } catch (InterruptedException e) {
+                // Callee connected and stops this thread with an interrupt.
             }
         }
     });
-    
+
     private final Thread callee = new Thread(new Runnable() {
         @Override
         public void run() {
             try {
-                console.write("DEBUG: calling accept");
-                clientSocket = serverSocket.accept();
-                console.write("DEBUG: accept returned - interrupting caller");
-                caller.interrupt();
-            } catch (SocketException e){
-                console.write("DEBUG: Friend called");
+                connection = serverSocket.accept();
+                caller.interrupt(); // someone called us => stop caller thread
+            } catch (SocketException e) {
+                // caller thread closed serverSocket which causes SocketException
             } catch (IOException ex) {
+                // todo: handle exception (quit program or recover properly)
                 Logger.getLogger(ChatConnector.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     });
-    
+
     ChatConnector(int serverPort, ChatConsole console) throws IOException {
         this.serverPort = serverPort;
         this.console = console;
         this.serverSocket = new ServerSocket(this.serverPort);
     }
-    
-    public Socket getConnection() throws InterruptedException {
-        if(clientSocket != null) {
-            return clientSocket;
+
+    ChatConnector(ChatConsole console) throws IOException {
+        this.serverPort = 8888; // todo: ask user
+        this.console = console;
+        this.serverSocket = new ServerSocket(this.serverPort);
+    }
+
+    public Socket connect() throws InterruptedException {
+        if (connection != null) {
+            return connection;
         }
-        
+
+        callee.setDaemon(true);
+        caller.setDaemon(true);
         callee.start();
         caller.start();
-        
         callee.join();
         caller.join();
-        
-        return clientSocket;
+
+        return connection;
     }
+
 }
